@@ -47,4 +47,37 @@
   &[data-key="Tab"] {
     width: 100px;
   }
+  &[data-key="Tab"],
+  &[data-key="ShiftLeft"],
+  &[data-key="CapsLock"] {
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
+  &[data-key="Enter"],
+  &[data-key="ShiftRight"],
+  &[data-key="Backspace"] {
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+  &[data-key="CapsLock"] {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 8px;
+      width: 8px;
+      height: 8px;
+      z-index: 10;
+      background-color: inherit;
+      border: 1px solid var(--gray);
+      border-radius: 50%;
+    }
+    &.active {
+      &::after {
+        border-color: #0da957;
+        background-color: #0da957;
+      }
+    }
+  }
 }

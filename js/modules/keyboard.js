@@ -26,8 +26,7 @@ export class MagicKeyboard {
       MagicKeyboard.toggleButtonState(keyCode, true);
       const keyData = this[_privateData].find((data) => data.key === keyCode);
       const { shiftKey, altKey } = event;
-      // const keyText = this.getKeyStatus(keyData, shiftKey, altKey);
-      this.inputKeyboard.insertText(keyData, shiftKey, altKey);
+      this.inputKeyboard.getKeyStatus(keyData, shiftKey, altKey);
     }
   }
 

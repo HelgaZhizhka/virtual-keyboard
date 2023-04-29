@@ -9,7 +9,23 @@ export default class InputKeyboard {
     this.textarea.focus();
   }
 
-  getKeyStatus(keyData, shiftKey, altKey) {
+  insertText(text) {
+    const cursorPosition = this.textarea.selectionStart;
+    const { value } = this.textarea;
+    if (!text) {
+      this.textarea.value = `${value.slice(0, cursorPosition - 1)}${value.slice(cursorPosition)}`;
+      this.textarea.selectionEnd = cursorPosition - 1;
+    } else {
+      this.textarea.value = `${value.slice(0, cursorPosition)}${text}${value.slice(cursorPosition)}`;
+      if (text === '\t') {
+        this.textarea.selectionEnd = cursorPosition + 1;
+      } else {
+        this.textarea.selectionEnd = cursorPosition + text.length;
+      }
+    }
+  }
+
+  getKeyValue(keyData, shiftKey, altKey) {
     const lang = this.languageManager.currentLanguage;
     const formattedLang = `${lang.charAt(0).toUpperCase()}${lang.slice(1)}`;
 
@@ -31,13 +47,28 @@ export default class InputKeyboard {
     this.focus();
   }
 
-  insertText(keyData, shiftKey, altKey) {
+  getKeyStatus(keyData, shiftKey, altKey) {
     if (keyData.printable) {
-      const cursorPosition = this.textarea.selectionStart;
-      const { value } = this.textarea;
-      const keyText = this.getKeyStatus(keyData, shiftKey, altKey);
-      this.textarea.value = `${value.slice(0, cursorPosition)}${keyText}${value.slice(cursorPosition)}`;
-      this.textarea.selectionEnd = cursorPosition + keyText.length;
+      const keyText = this.getKeyValue(keyData, shiftKey, altKey);
+      this.insertText(keyText);
+    } else {
+      const { key } = keyData;
+      switch (key) {
+        case 'Enter':
+          this.insertText('\n');
+          break;
+        case 'Tab':
+          this.insertText('\t');
+          break;
+        case 'Backspace':
+          this.insertText();
+          break;
+        // case 'CapsLock':
+        //   console.log('CapsLock');
+        //   break;
+        default:
+          break;
+      }
     }
   }
 }

@@ -449,4 +449,39 @@ body {
 }
 .key[data-key=Backspace], .key[data-key=Tab] {
   width: 100px;
+}
+.key[data-key=Tab], .key[data-key=ShiftLeft], .key[data-key=CapsLock] {
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+.key[data-key=Enter], .key[data-key=ShiftRight], .key[data-key=Backspace] {
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+}
+.key[data-key=CapsLock] {
+  position: relative;
+}
+.key[data-key=CapsLock]::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  z-index: 10;
+  background-color: inherit;
+  border: 1px solid var(--gray);
+  border-radius: 50%;
+}
+.key[data-key=CapsLock].active::after {
+  border-color: #0da957;
+  background-color: #0da957;
 }/*# sourceMappingURL=app.css.map */
