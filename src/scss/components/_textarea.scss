@@ -1,0 +1,9 @@
+.textarea {
+  line-height: 1.2;
+  background-color: var(--color-white);
+  border: 1px solid var(--light-gray);
+  padding: toRem(15px);
+  font-family: var(--system-ui);
+  font-size: 1rem;
+  border-radius: 1rem;
+}

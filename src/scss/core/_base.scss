@@ -1,0 +1,17 @@
+:root {
+  --color-white: #fff;
+  --dark-gray: #888888;
+  --light-gray: #f1f1ef;
+  --gray: #c4c4c4;
+
+  --body-bg: #fdb5bc;
+  --color-text: var(--color-white);
+  --heading-font-weight: 700;
+  --font-size: 1rem;
+  --line-height: 1.4;
+  --system-ui: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+  --transition-duration: 0.35s;
+  --transition-easing: cubic-bezier(0.5, 0, 0.5, 1);
+}
