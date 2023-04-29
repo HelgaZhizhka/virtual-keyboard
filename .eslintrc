@@ -10,8 +10,11 @@
   "rules": {
     "no-console": 0,
     "import/prefer-default-export": 0,
-    // "semi": 0,
-    "quotes": [2, "double",  "single", { "avoidEscape": true, "allowTemplateLiterals": true }]
-
+    "no-underscore-dangle": 0,
+    "import/extensions": 0,
+    "import/order": 0,
+    "quotes": 0,
+    "no-unused-expressions": 0,
+    "no-else-return": 0
   }
 }

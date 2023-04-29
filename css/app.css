@@ -304,7 +304,7 @@ body {
   text-shadow: 0 2px 4px rgba(136, 136, 136, 0.2);
   text-align: center;
 }
-.section__textarea {
+.section__textarea .textarea {
   width: 100%;
   height: 150px;
   font-size: 1.25rem;
@@ -424,8 +424,6 @@ body {
       -ms-user-select: none;
           user-select: none;
   cursor: pointer;
-  -webkit-transition: background-color 0.35s ease-in-out;
-  transition: background-color 0.35s ease-in-out;
 }
 .key:disabled, .key.disabled {
   -webkit-box-shadow: none;
