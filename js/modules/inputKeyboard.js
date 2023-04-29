@@ -10,14 +10,17 @@ export default class InputKeyboard {
   }
 
   getKeyStatus(keyData, shiftKey, altKey) {
-    if (shiftKey && altKey && keyData.shiftAlt) {
-      return keyData.shiftAlt;
-    } else if (shiftKey && keyData.shift) {
-      return keyData.shift;
-    } else if (altKey && keyData.alt) {
-      return keyData.alt;
+    const lang = this.languageManager.currentLanguage;
+    const formattedLang = `${lang.charAt(0).toUpperCase()}${lang.slice(1)}`;
+
+    if (shiftKey && altKey && keyData[`shiftAlt${formattedLang}`]) {
+      return keyData[`shiftAlt${formattedLang}`];
+    } else if (shiftKey && keyData[`shift${formattedLang}`]) {
+      return keyData[`shift${formattedLang}`];
+    } else if (altKey && keyData[`alt${formattedLang}`]) {
+      return keyData[`alt${formattedLang}`];
     } else {
-      return keyData[this.languageManager.currentLanguage];
+      return keyData[lang];
     }
   }
 
