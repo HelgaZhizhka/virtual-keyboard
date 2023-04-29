@@ -28,26 +28,26 @@ export class MagicKeyboard {
     active ? button.classList.add('active') : button.classList.remove('active');
   }
 
-  handleKeyDown(event) {
+  handleKeyDown(event, isMouseEvent) {
     event.preventDefault();
     this.inputKeyboard.focus();
-    // const key = this.keys.find((key) => key.dataset.key === event.code);
-    const key = this.keys[event.code];
+    const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
-      MagicKeyboard.toggleButtonState(event.code, true);
-      const keyData = this[_privateData].find((data) => data.key === event.code);
+      const keyCode = key.dataset.key;
+      MagicKeyboard.toggleButtonState(keyCode, true);
+      const keyData = this[_privateData].find((data) => data.key === keyCode);
       const { shiftKey, altKey } = event;
       const keyText = this.getKeyStatus(keyData, shiftKey, altKey);
       this.inputKeyboard.insertText(keyText);
     }
   }
 
-  handleKeyUp(event) {
+  handleKeyUp(event, isMouseEvent) {
     event.preventDefault();
-    const key = this.keys[event.code];
-    // const key = this.keys.find((key) => key.dataset.key === event.code);
+    const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
-      MagicKeyboard.toggleButtonState(event.code, false);
+      const keyCode = key.dataset.key;
+      MagicKeyboard.toggleButtonState(keyCode, false);
     }
   }
 
@@ -66,16 +66,11 @@ export class MagicKeyboard {
         key.dataset.key = keyData.key;
         key.textContent = keyData.en;
         rowElement.appendChild(key);
-        // this.keys.push(key);
         this.keys[keyData.key] = key;
-
-        key.addEventListener('click', () => {
-          this.inputKeyboard.focus();
-          this.inputKeyboard.insertText(key.textContent);
-        });
       });
     });
-
+    document.addEventListener('mousedown', (event) => this.handleKeyDown(event, true));
+    document.addEventListener('mouseup', (event) => this.handleKeyUp(event, true));
     document.addEventListener('keydown', (event) => this.handleKeyDown(event));
     document.addEventListener('keyup', (event) => this.handleKeyUp(event));
   }
