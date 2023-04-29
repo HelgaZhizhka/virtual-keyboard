@@ -604,7 +604,7 @@ export const data = [
       key: "ArrowUp",
       en: "▲",
       ru: "▲",
-      printable: false,
+      printable: true,
     },
     {
       key: "ShiftRight",
@@ -660,19 +660,19 @@ export const data = [
       key: "ArrowLeft",
       en: "◀",
       ru: "◀",
-      printable: false,
+      printable: true,
     },
     {
       key: "ArrowDown",
       en: "▼",
       ru: "▼",
-      printable: false,
+      printable: true,
     },
     {
       key: "ArrowRight",
       en: "▶",
       ru: "▶",
-      printable: false,
+      printable: true,
     },
   ],
 ];

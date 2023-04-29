@@ -1,11 +1,24 @@
 export default class InputKeyboard {
-  constructor(container) {
+  constructor(container, languageManager) {
     this.textarea = null;
     this.container = container;
+    this.languageManager = languageManager;
   }
 
   focus() {
     this.textarea.focus();
+  }
+
+  getKeyStatus(keyData, shiftKey, altKey) {
+    if (shiftKey && altKey && keyData.shiftAlt) {
+      return keyData.shiftAlt;
+    } else if (shiftKey && keyData.shift) {
+      return keyData.shift;
+    } else if (altKey && keyData.alt) {
+      return keyData.alt;
+    } else {
+      return keyData[this.languageManager.currentLanguage];
+    }
   }
 
   init() {
@@ -15,7 +28,13 @@ export default class InputKeyboard {
     this.focus();
   }
 
-  insertText(text) {
-    console.log(text, this.container);
+  insertText(keyData, shiftKey, altKey) {
+    if (keyData.printable) {
+      const cursorPosition = this.textarea.selectionStart;
+      const { value } = this.textarea;
+      const keyText = this.getKeyStatus(keyData, shiftKey, altKey);
+      this.textarea.value = `${value.slice(0, cursorPosition)}${keyText}${value.slice(cursorPosition)}`;
+      this.textarea.selectionEnd = cursorPosition + keyText.length;
+    }
   }
 }

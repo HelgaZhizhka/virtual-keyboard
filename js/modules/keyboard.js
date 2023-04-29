@@ -1,26 +1,15 @@
 const _privateData = Symbol('privateData');
 
 export class MagicKeyboard {
-  constructor(containerKeyboard, data, inputKeyboard) {
+  constructor(containerKeyboard, data, inputKeyboard, languageManager) {
     this.container = null;
     this.keys = {};
     this.currentLanguage = 'en';
     this.containerKeyboard = containerKeyboard;
     this.inputKeyboard = inputKeyboard;
+    this.languageManager = languageManager;
     this.data = data;
     this[_privateData] = [].concat(...data);
-  }
-
-  getKeyStatus(keyData, shiftKey, altKey) {
-    if (shiftKey && altKey && keyData.shiftAlt) {
-      return keyData.shiftAlt;
-    } else if (shiftKey && keyData.shift) {
-      return keyData.shift;
-    } else if (altKey && keyData.alt) {
-      return keyData.alt;
-    } else {
-      return keyData[this.currentLanguage];
-    }
   }
 
   static toggleButtonState(keyCode, active) {
@@ -37,8 +26,8 @@ export class MagicKeyboard {
       MagicKeyboard.toggleButtonState(keyCode, true);
       const keyData = this[_privateData].find((data) => data.key === keyCode);
       const { shiftKey, altKey } = event;
-      const keyText = this.getKeyStatus(keyData, shiftKey, altKey);
-      this.inputKeyboard.insertText(keyText);
+      // const keyText = this.getKeyStatus(keyData, shiftKey, altKey);
+      this.inputKeyboard.insertText(keyData, shiftKey, altKey);
     }
   }
 
@@ -69,6 +58,7 @@ export class MagicKeyboard {
         this.keys[keyData.key] = key;
       });
     });
+
     document.addEventListener('mousedown', (event) => this.handleKeyDown(event, true));
     document.addEventListener('mouseup', (event) => this.handleKeyUp(event, true));
     document.addEventListener('keydown', (event) => this.handleKeyDown(event));
