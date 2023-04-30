@@ -29,7 +29,7 @@ export default class InputKeyboard {
     }
   }
 
-  getKeyValue(keyData, shiftKey, altKey) {
+  getKeyValue(keyData, shiftKey, altKey, isCapsLocked) {
     const langCode = this.formattingLang();
     let keyValue;
 
@@ -42,12 +42,12 @@ export default class InputKeyboard {
     } else {
       keyValue = keyData[this.languageManager.currentLanguage];
     }
-    return keyValue;
+    return !isCapsLocked ? keyValue : keyValue.toUpperCase();
   }
 
-  keyDetection(keyData, shiftKey, altKey) {
+  keyDetection(keyData, shiftKey, altKey, isCapsLocked) {
     if (keyData.printable) {
-      const keyText = this.getKeyValue(keyData, shiftKey, altKey);
+      const keyText = this.getKeyValue(keyData, shiftKey, altKey, isCapsLocked);
       this.insertText(keyText);
     } else {
       const { key } = keyData;

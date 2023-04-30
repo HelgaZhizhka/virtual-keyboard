@@ -1,4 +1,5 @@
 const _privateData = Symbol('privateData');
+const isWindows = /Win/.test(window.navigator.userAgent);
 
 export class MagicKeyboard {
   constructor(containerKeyboard, data, inputKeyboard, languageManager) {
@@ -23,7 +24,7 @@ export class MagicKeyboard {
     active ? button.classList.add('active') : button.classList.remove('active');
   }
 
-  updateCapsLockKeys() {
+  updateCapsLockLabels() {
     const buttons = this.getArrayKeys().filter((btn) => +btn.dataset.print && btn.textContent.match(/[a-zA-Zа-яА-ЯёЁ]/));
     buttons.forEach((btn) => {
       const button = btn;
@@ -35,20 +36,11 @@ export class MagicKeyboard {
     });
   }
 
-  checkCapsStatus(key, event, isMouseEvent) {
-    key.classList.toggle('active');
-    const capsKey = event.getModifierState('CapsLock');
-    this.isCapsLocked = isMouseEvent ? !this.isCapsLocked : capsKey;
-    this.updateCapsLockKeys();
-  }
-
   updateKeyLabels(shiftPressed, altPressed) {
-    this.data.forEach((row) => {
-      row.forEach((keyData) => {
-        const key = this.keys[keyData.key];
-        const keyValue = this.inputKeyboard.getKeyValue(keyData, shiftPressed, altPressed);
-        key.textContent = keyValue;
-      });
+    this[_privateData].forEach((keyData) => {
+      const key = this.keys[keyData.key];
+      const keyValue = this.inputKeyboard.getKeyValue(keyData, shiftPressed, altPressed);
+      key.textContent = keyValue;
     });
   }
 
@@ -60,9 +52,10 @@ export class MagicKeyboard {
       const keyCode = key.dataset.key;
       const keyData = this[_privateData].find((keyObj) => keyObj.key === keyCode);
       const { shiftKey, altKey } = event;
-
       if (keyCode === 'CapsLock') {
-        this.checkCapsStatus(key, event, isMouseEvent);
+        key.classList.toggle('active');
+        this.isCapsLocked = !this.isCapsLocked;
+        this.updateCapsLockLabels();
       } else {
         this.toggleButtonState(keyCode, true);
       }
@@ -70,16 +63,17 @@ export class MagicKeyboard {
       if (isMouseEvent) {
         if (['ShiftLeft', 'ShiftRight'].includes(keyCode)) {
           this.isShiftPressed = !this.isShiftPressed;
+          this.updateKeyLabels(this.isShiftPressed, this.isAltPressed);
         }
         if (['AltLeft', 'AltRight'].includes(keyCode)) {
           this.isAltPressed = !this.isAltPressed;
+          this.updateKeyLabels(this.isShiftPressed, this.isAltPressed);
         }
-        this.updateKeyLabels(this.isShiftPressed, this.isAltPressed);
       } else if (['ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight'].includes(keyCode)) {
         this.updateKeyLabels(event.shiftKey, event.altKey);
       }
-      this.inputKeyboard.keyDetection(keyData, shiftKey, altKey);
-      console.log(this.isCapsLocked);
+
+      this.inputKeyboard.keyDetection(keyData, shiftKey, altKey, this.isCapsLocked);
     }
   }
 
@@ -90,7 +84,11 @@ export class MagicKeyboard {
       const keyCode = key.dataset.key;
 
       if (keyCode === 'CapsLock') {
-        this.checkCapsStatus(key, event, isMouseEvent);
+        if (!isMouseEvent && !isWindows) {
+          key.classList.toggle('active');
+          this.isCapsLocked = !this.isCapsLocked;
+          this.updateCapsLockLabels();
+        }
       } else {
         this.toggleButtonState(keyCode, false);
       }
@@ -98,15 +96,15 @@ export class MagicKeyboard {
       if (isMouseEvent) {
         if (['ShiftLeft', 'ShiftRight'].includes(keyCode)) {
           this.isShiftPressed = false;
+          this.updateKeyLabels(this.isShiftPressed, this.isAltPressed);
         }
         if (['AltLeft', 'AltRight'].includes(keyCode)) {
           this.isAltPressed = false;
+          this.updateKeyLabels(this.isShiftPressed, this.isAltPressed);
         }
-        this.updateKeyLabels(this.isShiftPressed, this.isAltPressed);
       } else if (['ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight'].includes(keyCode)) {
         this.updateKeyLabels(event.shiftKey, event.altKey);
       }
-      console.log(this.isCapsLocked);
     }
   }
 
