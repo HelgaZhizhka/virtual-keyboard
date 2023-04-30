@@ -4,8 +4,9 @@ export class MagicKeyboard {
   constructor(containerKeyboard, data, inputKeyboard, languageManager) {
     this.container = null;
     this.keys = {};
-    this.currentLanguage = 'en';
     this.isCapsLocked = false;
+    this.isShiftPressed = false;
+    this.isAltPressed = false;
     this.containerKeyboard = containerKeyboard;
     this.inputKeyboard = inputKeyboard;
     this.languageManager = languageManager;
@@ -13,17 +14,20 @@ export class MagicKeyboard {
     this[_privateData] = [].concat(...data);
   }
 
+  getArrayKeys() {
+    return Object.keys(this.keys).map((key) => this.keys[key]);
+  }
+
   toggleButtonState(keyCode, active) {
     const button = this.keys[keyCode];
     active ? button.classList.add('active') : button.classList.remove('active');
   }
 
-  updateKeys() {
-    const buttons = Object.keys(this.keys)
-      .map((key) => this.keys[key]).filter((btn) => +btn.dataset.print);
+  updateCapsLockKeys() {
+    const buttons = this.getArrayKeys().filter((btn) => +btn.dataset.print && btn.textContent.match(/[a-zA-Zа-яА-ЯёЁ]/));
     buttons.forEach((btn) => {
       const button = btn;
-      if (this.isCapsLocked && button.textContent.match(/[a-zA-Zа-яА-ЯёЁ]/)) {
+      if (this.isCapsLocked) {
         button.textContent = button.textContent.toUpperCase();
       } else {
         button.textContent = button.textContent.toLowerCase();
@@ -31,81 +35,79 @@ export class MagicKeyboard {
     });
   }
 
-  keyDetection(keyData, shiftKey, altKey) {
-    if (keyData.printable) {
-      // const keyText = this.getKeyValue(keyData, shiftKey, altKey);
-      // this.insertText(keyText);
-    } else {
-      const { key } = keyData;
-      switch (key) {
-        case 'Enter':
-          this.inputKeyboard.insertText('\n');
-          break;
-        case 'Tab':
-          this.inputKeyboard.insertText('\t');
-          break;
-        case 'Backspace':
-          this.inputKeyboard.insertText();
-          break;
-        case 'CapsLock':
-          if (this.isCapsLocked) {
-            console.log('CapsLock on');
-            this.updateKeys();
-          } else {
-            console.log('CapsLock off');
-          }
-          break;
-        case 'Space':
-          this.inputKeyboard.insertText(' ');
-          break;
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          console.log('Shift');
-          break;
-        case 'AltLeft':
-        case 'AltRight':
-          console.log('Alt');
-          break;
-        default:
-          break;
-      }
-    }
+  checkCapsStatus(key, event, isMouseEvent) {
+    key.classList.toggle('active');
+    const capsKey = event.getModifierState('CapsLock');
+    this.isCapsLocked = isMouseEvent ? !this.isCapsLocked : capsKey;
+    this.updateCapsLockKeys();
   }
 
-  handleKeyDown(event, isMouseEvent) {
+  updateKeyLabels(shiftPressed, altPressed) {
+    this.data.forEach((row) => {
+      row.forEach((keyData) => {
+        const key = this.keys[keyData.key];
+        const keyValue = this.inputKeyboard.getKeyValue(keyData, shiftPressed, altPressed);
+        key.textContent = keyValue;
+      });
+    });
+  }
+
+  handleKeyDown(event, isMouseEvent = false) {
     event.preventDefault();
     this.inputKeyboard.focus();
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
       const keyCode = key.dataset.key;
-      const keyData = this[_privateData].find((data) => data.key === keyCode);
+      const keyData = this[_privateData].find((keyObj) => keyObj.key === keyCode);
       const { shiftKey, altKey } = event;
-      const capsKey = isMouseEvent ? event.target.closest('.keyboard__key').dataset.key === 'CapsLock' : event.getModifierState('CapsLock');
-      if (keyCode === 'CapsLock' || (isMouseEvent && keyCode === 'CapsLock')) {
-        key.classList.toggle('active');
-        this.isCapsLocked = isMouseEvent ? !this.isCapsLocked : capsKey;
+
+      if (keyCode === 'CapsLock') {
+        this.checkCapsStatus(key, event, isMouseEvent);
       } else {
         this.toggleButtonState(keyCode, true);
       }
-      this.keyDetection(keyData, shiftKey, altKey);
-      // this.inputKeyboard.getKeyStatus(keyData, shiftKey, altKey, this.isCapsLocked, dataKeys);
+
+      if (isMouseEvent) {
+        if (['ShiftLeft', 'ShiftRight'].includes(keyCode)) {
+          this.isShiftPressed = !this.isShiftPressed;
+        }
+        if (['AltLeft', 'AltRight'].includes(keyCode)) {
+          this.isAltPressed = !this.isAltPressed;
+        }
+        this.updateKeyLabels(this.isShiftPressed, this.isAltPressed);
+      } else if (['ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight'].includes(keyCode)) {
+        this.updateKeyLabels(event.shiftKey, event.altKey);
+      }
+      this.inputKeyboard.keyDetection(keyData, shiftKey, altKey);
+      console.log(this.isCapsLocked);
     }
   }
 
-  handleKeyUp(event, isMouseEvent) {
+  handleKeyUp(event, isMouseEvent = false) {
     event.preventDefault();
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
       const keyCode = key.dataset.key;
-      if (keyCode !== 'CapsLock' || (!isMouseEvent && keyCode === 'CapsLock')) {
+
+      if (keyCode === 'CapsLock') {
+        this.checkCapsStatus(key, event, isMouseEvent);
+      } else {
         this.toggleButtonState(keyCode, false);
       }
-      if (!isMouseEvent && keyCode === 'CapsLock') {
-        this.isCapsLocked = event.getModifierState('CapsLock'); 
+
+      if (isMouseEvent) {
+        if (['ShiftLeft', 'ShiftRight'].includes(keyCode)) {
+          this.isShiftPressed = false;
+        }
+        if (['AltLeft', 'AltRight'].includes(keyCode)) {
+          this.isAltPressed = false;
+        }
+        this.updateKeyLabels(this.isShiftPressed, this.isAltPressed);
+      } else if (['ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight'].includes(keyCode)) {
+        this.updateKeyLabels(event.shiftKey, event.altKey);
       }
+      console.log(this.isCapsLocked);
     }
-    console.log(this.isCapsLocked);
-    this.updateKeys();
   }
 
   init() {
@@ -122,7 +124,7 @@ export class MagicKeyboard {
         key.classList.add('keyboard__key', 'key');
         key.dataset.key = keyData.key;
         key.dataset.print = +keyData.printable;
-        key.textContent = keyData[this.currentLanguage];
+        key.textContent = keyData[this.languageManager.currentLanguage];
         rowElement.appendChild(key);
         this.keys[keyData.key] = key;
       });

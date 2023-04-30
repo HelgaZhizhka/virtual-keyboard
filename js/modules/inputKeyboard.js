@@ -5,6 +5,10 @@ export default class InputKeyboard {
     this.languageManager = languageManager;
   }
 
+  formattingLang() {
+    return `${this.languageManager.currentLanguage.charAt(0).toUpperCase()}${this.languageManager.currentLanguage.slice(1)}`;
+  }
+
   focus() {
     this.textarea.focus();
   }
@@ -26,36 +30,24 @@ export default class InputKeyboard {
   }
 
   getKeyValue(keyData, shiftKey, altKey) {
-    const lang = this.languageManager.currentLanguage;
-    const formattedLang = `${lang.charAt(0).toUpperCase()}${lang.slice(1)}`;
+    const langCode = this.formattingLang();
     let keyValue;
 
-    if (shiftKey && altKey && keyData[`shiftAlt${formattedLang}`]) {
-      keyValue = keyData[`shiftAlt${formattedLang}`];
-    } else if (shiftKey && keyData[`shift${formattedLang}`]) {
-      keyValue = keyData[`shift${formattedLang}`];
-    } else if (altKey && keyData[`alt${formattedLang}`]) {
-      keyValue = keyData[`alt${formattedLang}`];
+    if (shiftKey && altKey && keyData[`shiftAlt${langCode}`]) {
+      keyValue = keyData[`shiftAlt${langCode}`];
+    } else if (shiftKey && keyData[`shift${langCode}`]) {
+      keyValue = keyData[`shift${langCode}`];
+    } else if (altKey && keyData[`alt${langCode}`]) {
+      keyValue = keyData[`alt${langCode}`];
     } else {
-      keyValue = keyData[lang];
+      keyValue = keyData[this.languageManager.currentLanguage];
     }
-    // if (isCapsLocked && keyValue.match(/[a-zA-Zа-яА-ЯёЁ]/)) {
-    //   keyValue = keyValue === keyValue.toUpperCase()
-    //     ? keyValue.toLowerCase() : keyValue.toUpperCase();
-    // }
     return keyValue;
   }
 
-  init() {
-    this.textarea = document.createElement('textarea');
-    this.textarea.classList.add('textarea');
-    this.container.appendChild(this.textarea);
-    this.focus();
-  }
-
-  getKeyStatus(keyData, shiftKey, altKey, isCapsLocked) {
+  keyDetection(keyData, shiftKey, altKey) {
     if (keyData.printable) {
-      const keyText = this.getKeyValue(keyData, shiftKey, altKey, isCapsLocked);
+      const keyText = this.getKeyValue(keyData, shiftKey, altKey);
       this.insertText(keyText);
     } else {
       const { key } = keyData;
@@ -69,27 +61,19 @@ export default class InputKeyboard {
         case 'Backspace':
           this.insertText();
           break;
-        case 'CapsLock':
-          if (isCapsLocked) {
-            console.log('CapsLock on');
-          } else {
-            console.log('CapsLock off');
-          }
-          break;
         case 'Space':
           this.insertText(' ');
-          break;
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          console.log('Shift');
-          break;
-        case 'AltLeft':
-        case 'AltRight':
-          console.log('Alt');
           break;
         default:
           break;
       }
     }
+  }
+
+  init() {
+    this.textarea = document.createElement('textarea');
+    this.textarea.classList.add('textarea');
+    this.container.appendChild(this.textarea);
+    this.focus();
   }
 }
