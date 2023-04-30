@@ -28,16 +28,22 @@ export default class InputKeyboard {
   getKeyValue(keyData, shiftKey, altKey) {
     const lang = this.languageManager.currentLanguage;
     const formattedLang = `${lang.charAt(0).toUpperCase()}${lang.slice(1)}`;
+    let keyValue;
 
     if (shiftKey && altKey && keyData[`shiftAlt${formattedLang}`]) {
-      return keyData[`shiftAlt${formattedLang}`];
+      keyValue = keyData[`shiftAlt${formattedLang}`];
     } else if (shiftKey && keyData[`shift${formattedLang}`]) {
-      return keyData[`shift${formattedLang}`];
+      keyValue = keyData[`shift${formattedLang}`];
     } else if (altKey && keyData[`alt${formattedLang}`]) {
-      return keyData[`alt${formattedLang}`];
+      keyValue = keyData[`alt${formattedLang}`];
     } else {
-      return keyData[lang];
+      keyValue = keyData[lang];
     }
+    // if (isCapsLocked && keyValue.match(/[a-zA-Zа-яА-ЯёЁ]/)) {
+    //   keyValue = keyValue === keyValue.toUpperCase()
+    //     ? keyValue.toLowerCase() : keyValue.toUpperCase();
+    // }
+    return keyValue;
   }
 
   init() {
@@ -47,9 +53,9 @@ export default class InputKeyboard {
     this.focus();
   }
 
-  getKeyStatus(keyData, shiftKey, altKey) {
+  getKeyStatus(keyData, shiftKey, altKey, isCapsLocked) {
     if (keyData.printable) {
-      const keyText = this.getKeyValue(keyData, shiftKey, altKey);
+      const keyText = this.getKeyValue(keyData, shiftKey, altKey, isCapsLocked);
       this.insertText(keyText);
     } else {
       const { key } = keyData;
@@ -63,9 +69,24 @@ export default class InputKeyboard {
         case 'Backspace':
           this.insertText();
           break;
-        // case 'CapsLock':
-        //   console.log('CapsLock');
-        //   break;
+        case 'CapsLock':
+          if (isCapsLocked) {
+            console.log('CapsLock on');
+          } else {
+            console.log('CapsLock off');
+          }
+          break;
+        case 'Space':
+          this.insertText(' ');
+          break;
+        case 'ShiftLeft':
+        case 'ShiftRight':
+          console.log('Shift');
+          break;
+        case 'AltLeft':
+        case 'AltRight':
+          console.log('Alt');
+          break;
         default:
           break;
       }

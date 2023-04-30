@@ -5,6 +5,7 @@ export class MagicKeyboard {
     this.container = null;
     this.keys = {};
     this.currentLanguage = 'en';
+    this.isCapsLocked = false;
     this.containerKeyboard = containerKeyboard;
     this.inputKeyboard = inputKeyboard;
     this.languageManager = languageManager;
@@ -12,9 +13,63 @@ export class MagicKeyboard {
     this[_privateData] = [].concat(...data);
   }
 
-  static toggleButtonState(keyCode, active) {
-    const button = document.querySelector(`[data-key="${keyCode}"]`);
+  toggleButtonState(keyCode, active) {
+    const button = this.keys[keyCode];
     active ? button.classList.add('active') : button.classList.remove('active');
+  }
+
+  updateKeys() {
+    const buttons = Object.keys(this.keys)
+      .map((key) => this.keys[key]).filter((btn) => +btn.dataset.print);
+    buttons.forEach((btn) => {
+      const button = btn;
+      if (this.isCapsLocked && button.textContent.match(/[a-zA-Zа-яА-ЯёЁ]/)) {
+        button.textContent = button.textContent.toUpperCase();
+      } else {
+        button.textContent = button.textContent.toLowerCase();
+      }
+    });
+  }
+
+  keyDetection(keyData, shiftKey, altKey) {
+    if (keyData.printable) {
+      // const keyText = this.getKeyValue(keyData, shiftKey, altKey);
+      // this.insertText(keyText);
+    } else {
+      const { key } = keyData;
+      switch (key) {
+        case 'Enter':
+          this.inputKeyboard.insertText('\n');
+          break;
+        case 'Tab':
+          this.inputKeyboard.insertText('\t');
+          break;
+        case 'Backspace':
+          this.inputKeyboard.insertText();
+          break;
+        case 'CapsLock':
+          if (this.isCapsLocked) {
+            console.log('CapsLock on');
+            this.updateKeys();
+          } else {
+            console.log('CapsLock off');
+          }
+          break;
+        case 'Space':
+          this.inputKeyboard.insertText(' ');
+          break;
+        case 'ShiftLeft':
+        case 'ShiftRight':
+          console.log('Shift');
+          break;
+        case 'AltLeft':
+        case 'AltRight':
+          console.log('Alt');
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   handleKeyDown(event, isMouseEvent) {
@@ -23,10 +78,17 @@ export class MagicKeyboard {
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
       const keyCode = key.dataset.key;
-      MagicKeyboard.toggleButtonState(keyCode, true);
       const keyData = this[_privateData].find((data) => data.key === keyCode);
       const { shiftKey, altKey } = event;
-      this.inputKeyboard.getKeyStatus(keyData, shiftKey, altKey);
+      const capsKey = isMouseEvent ? event.target.closest('.keyboard__key').dataset.key === 'CapsLock' : event.getModifierState('CapsLock');
+      if (keyCode === 'CapsLock' || (isMouseEvent && keyCode === 'CapsLock')) {
+        key.classList.toggle('active');
+        this.isCapsLocked = isMouseEvent ? !this.isCapsLocked : capsKey;
+      } else {
+        this.toggleButtonState(keyCode, true);
+      }
+      this.keyDetection(keyData, shiftKey, altKey);
+      // this.inputKeyboard.getKeyStatus(keyData, shiftKey, altKey, this.isCapsLocked, dataKeys);
     }
   }
 
@@ -35,8 +97,15 @@ export class MagicKeyboard {
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
       const keyCode = key.dataset.key;
-      MagicKeyboard.toggleButtonState(keyCode, false);
+      if (keyCode !== 'CapsLock' || (!isMouseEvent && keyCode === 'CapsLock')) {
+        this.toggleButtonState(keyCode, false);
+      }
+      if (!isMouseEvent && keyCode === 'CapsLock') {
+        this.isCapsLocked = event.getModifierState('CapsLock'); 
+      }
     }
+    console.log(this.isCapsLocked);
+    this.updateKeys();
   }
 
   init() {
@@ -52,7 +121,8 @@ export class MagicKeyboard {
         const key = document.createElement('button');
         key.classList.add('keyboard__key', 'key');
         key.dataset.key = keyData.key;
-        key.textContent = keyData.en;
+        key.dataset.print = +keyData.printable;
+        key.textContent = keyData[this.currentLanguage];
         rowElement.appendChild(key);
         this.keys[keyData.key] = key;
       });
