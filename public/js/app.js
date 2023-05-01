@@ -1,8 +1,8 @@
-import { data } from './modules/data.js';
+import data from './modules/data.js';
 import InputKeyboard from './modules/inputKeyboard.js';
-import { getLayoutBase } from './modules/getLayoutBase.js';
-import { MagicKeyboard } from './modules/keyboard.js';
-import { LanguageManager } from './modules/languageManager.js';
+import getLayoutBase from './modules/getLayoutBase.js';
+import MagicKeyboard from './modules/keyboard.js';
+import LanguageManager from './modules/languageManager.js';
 
 const onLoadPage = () => {
   // generate basic layout for start page
@@ -19,4 +19,4 @@ const onLoadPage = () => {
   keyboard.init();
 };
 
-document.addEventListener("DOMContentLoaded", onLoadPage);
+document.addEventListener('DOMContentLoaded', onLoadPage);

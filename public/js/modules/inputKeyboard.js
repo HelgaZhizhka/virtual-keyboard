@@ -69,7 +69,7 @@ export default class InputKeyboard {
   init() {
     this.textarea = document.createElement('textarea');
     this.textarea.classList.add('textarea');
-    this.textarea.autocomplete = "off";
+    this.textarea.autocomplete = 'off';
     this.container.appendChild(this.textarea);
     this.focus();
   }

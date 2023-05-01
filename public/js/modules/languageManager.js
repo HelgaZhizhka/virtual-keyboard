@@ -1,4 +1,4 @@
-export class LanguageManager {
+class LanguageManager {
   constructor() {
     this.language = 'en';
     this.loadLanguageFromLocalStorage();
@@ -28,3 +28,4 @@ export class LanguageManager {
     this.currentLanguage = this.currentLanguage === 'en' ? 'ru' : 'en';
   }
 }
+export default LanguageManager;

@@ -1,7 +1,7 @@
-const _privateData = Symbol('privateData');
+const privateArr = Symbol('privateArr');
 const isWindows = /Win/.test(window.navigator.userAgent);
 
-export class MagicKeyboard {
+class MagicKeyboard {
   constructor(containerKeyboard, data, inputKeyboard, languageManager) {
     this.container = null;
     this.keys = {};
@@ -12,7 +12,7 @@ export class MagicKeyboard {
     this.inputKeyboard = inputKeyboard;
     this.languageManager = languageManager;
     this.data = data;
-    this[_privateData] = [].concat(...data);
+    this[privateArr] = [].concat(...data);
     this.transitionEndHandler = MagicKeyboard.handleTransitionEnd.bind(this);
   }
 
@@ -28,41 +28,47 @@ export class MagicKeyboard {
 
   toggleButtonState(keyCode, active) {
     const button = this.keys[keyCode];
-    active ? button.classList.add('active') : button.classList.remove('active');
+    if (active) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
   }
 
   updateKeyWithAnimation(keyData, shiftPressed, altPressed, isCaps = false) {
-    const key = this.keys[keyData.key].querySelector('.key__value');
-    const keyValue = this.inputKeyboard
-      .getKeyValue(keyData, shiftPressed, altPressed, this.isCapsLocked);
-    key.classList.add('key-fade');
-    key.addEventListener('transitionend', this.transitionEndHandler);
+    if (keyData.printable) {
+      const key = this.keys[keyData.key].querySelector('.key__value');
+      const keyValue = this.inputKeyboard
+        .getKeyValue(keyData, shiftPressed, altPressed, this.isCapsLocked);
+      key.classList.add('key-fade');
+      key.addEventListener('transitionend', this.transitionEndHandler);
 
-    setTimeout(() => {
-      if (!isCaps) {
-        key.textContent = keyValue;
-      } else {
-        this.isCapsLocked ? key.textContent = key.textContent.toUpperCase()
-          : key.textContent = key.textContent.toLowerCase();
-      }
-    }, 50);
+      setTimeout(() => {
+        if (!isCaps) {
+          key.textContent = keyValue;
+        } else {
+          key.textContent = this.isCapsLocked
+            ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+        }
+      }, 50);
+    }
   }
 
   updateLanguageLabels() {
     this.languageManager.toggleLanguage();
-    const keys = this[_privateData].filter((key) => key.printable && key[this.languageManager.currentLanguage].match(/[a-zA-Zа-яА-ЯёЁ]/));
+    const keys = this[privateArr].filter((key) => key.printable && key[this.languageManager.currentLanguage].match(/[a-zA-Zа-яА-ЯёЁ]/));
     keys.forEach((keyData) => this
       .updateKeyWithAnimation(keyData, this.isShiftPressed, this.isAltPressed));
   }
 
   updateCapsLockLabels() {
-    const keys = this[_privateData].filter((key) => key.printable && key[this.languageManager.currentLanguage].match(/[a-zA-Zа-яА-ЯёЁ]/));
+    const keys = this[privateArr].filter((key) => key.printable && key[this.languageManager.currentLanguage].match(/[a-zA-Zа-яА-ЯёЁ]/));
     keys.forEach((keyData) => this
       .updateKeyWithAnimation(keyData, this.isShiftPressed, this.isAltPressed, true));
   }
 
   updateKeyLabels(shiftPressed, altPressed) {
-    this[_privateData].forEach((keyData) => {
+    this[privateArr].forEach((keyData) => {
       this.updateKeyWithAnimation(keyData, shiftPressed, altPressed);
     });
   }
@@ -73,7 +79,7 @@ export class MagicKeyboard {
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
       const keyCode = key.dataset.key;
-      const keyData = this[_privateData].find((keyObj) => keyObj.key === keyCode);
+      const keyData = this[privateArr].find((keyObj) => keyObj.key === keyCode);
       const { shiftKey, altKey } = event;
       if (keyCode === 'CapsLock') {
         key.classList.toggle('active');
@@ -166,3 +172,4 @@ export class MagicKeyboard {
     document.addEventListener('keyup', (event) => this.handleKeyUp(event));
   }
 }
+export default MagicKeyboard;
