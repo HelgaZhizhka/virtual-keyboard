@@ -33,6 +33,12 @@
     background-color: var(--color-white);
     transform: translateY(1px);
   }
+  &[data-key="ControlLeft"],
+  &[data-key="AltLeft"],
+  &[data-key="ControlRight"],
+  &[data-key="AltRight"] {
+    text-transform: lowercase !important;
+  }
   &[data-key="Space"] {
     width: 220px;
     text-indent: -9999px;
@@ -80,4 +86,8 @@
       }
     }
   }
+}
+.key-fade {
+  transition: opacity 0.25s ease-in-out;
+  opacity: 0;
 }

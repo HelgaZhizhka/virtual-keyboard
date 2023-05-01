@@ -13,26 +13,17 @@ export class MagicKeyboard {
     this.languageManager = languageManager;
     this.data = data;
     this[_privateData] = [].concat(...data);
+    this.transitionEndHandler = MagicKeyboard.handleTransitionEnd.bind(this);
   }
 
-  updateLanguageLabels() {
-    this.languageManager.toggleLanguage();
-    const updateKey = (keyData) => {
-      const key = this.keys[keyData.key];
-      const keyValue = this.inputKeyboard.getKeyValue(keyData);
-      key.textContent = keyValue;
-    };
-    this[_privateData].forEach((keyData) => {
-      if (keyData.printable && keyData[this.languageManager.currentLanguage].match(/[a-zA-Zа-яА-ЯёЁ]/)) {
-        if (keyData.altEn || keyData.altRu) {
-          setTimeout(() => {
-            updateKey(keyData);
-          }, 50);
-        } else {
-          updateKey(keyData);
-        }
-      }
+  destroy() {
+    Object.values(this.keys).forEach((key) => {
+      key.removeEventListener('transitionend', this.transitionEndHandler);
     });
+  }
+
+  static handleTransitionEnd(event) {
+    event.target.classList.remove('key-fade');
   }
 
   toggleButtonState(keyCode, active) {
@@ -40,24 +31,39 @@ export class MagicKeyboard {
     active ? button.classList.add('active') : button.classList.remove('active');
   }
 
-  updateCapsLockLabels() {
-    const getArrayKeys = () => Object.keys(this.keys).map((key) => this.keys[key]);
-    const buttons = getArrayKeys().filter((btn) => +btn.dataset.print && btn.textContent.match(/[a-zA-Zа-яА-ЯёЁ]/));
-    buttons.forEach((btn) => {
-      const button = btn;
-      if (this.isCapsLocked) {
-        button.textContent = button.textContent.toUpperCase();
+  updateKeyWithAnimation(keyData, shiftPressed, altPressed, isCaps = false) {
+    const key = this.keys[keyData.key].querySelector('.key__value');
+    const keyValue = this.inputKeyboard
+      .getKeyValue(keyData, shiftPressed, altPressed, this.isCapsLocked);
+    key.classList.add('key-fade');
+    key.addEventListener('transitionend', this.transitionEndHandler);
+
+    setTimeout(() => {
+      if (!isCaps) {
+        key.textContent = keyValue;
       } else {
-        button.textContent = button.textContent.toLowerCase();
+        this.isCapsLocked ? key.textContent = key.textContent.toUpperCase()
+          : key.textContent = key.textContent.toLowerCase();
       }
-    });
+    }, 50);
+  }
+
+  updateLanguageLabels() {
+    this.languageManager.toggleLanguage();
+    const keys = this[_privateData].filter((key) => key.printable && key[this.languageManager.currentLanguage].match(/[a-zA-Zа-яА-ЯёЁ]/));
+    keys.forEach((keyData) => this
+      .updateKeyWithAnimation(keyData, this.isShiftPressed, this.isAltPressed));
+  }
+
+  updateCapsLockLabels() {
+    const keys = this[_privateData].filter((key) => key.printable && key[this.languageManager.currentLanguage].match(/[a-zA-Zа-яА-ЯёЁ]/));
+    keys.forEach((keyData) => this
+      .updateKeyWithAnimation(keyData, this.isShiftPressed, this.isAltPressed, true));
   }
 
   updateKeyLabels(shiftPressed, altPressed) {
     this[_privateData].forEach((keyData) => {
-      const key = this.keys[keyData.key];
-      const keyValue = this.inputKeyboard.getKeyValue(keyData, shiftPressed, altPressed);
-      key.textContent = keyValue;
+      this.updateKeyWithAnimation(keyData, shiftPressed, altPressed);
     });
   }
 
@@ -143,7 +149,12 @@ export class MagicKeyboard {
         key.classList.add('keyboard__key', 'key');
         key.dataset.key = keyData.key;
         key.dataset.print = +keyData.printable;
-        key.textContent = keyData[this.languageManager.currentLanguage];
+
+        const span = document.createElement('span');
+        span.classList.add('key__value');
+        span.textContent = keyData[this.languageManager.currentLanguage];
+        key.appendChild(span);
+
         rowElement.appendChild(key);
         this.keys[keyData.key] = key;
       });

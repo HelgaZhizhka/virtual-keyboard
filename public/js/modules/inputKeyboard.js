@@ -21,11 +21,7 @@ export default class InputKeyboard {
       this.textarea.selectionEnd = cursorPosition - 1;
     } else {
       this.textarea.value = `${value.slice(0, cursorPosition)}${text}${value.slice(cursorPosition)}`;
-      if (text === '\t') {
-        this.textarea.selectionEnd = cursorPosition + 1;
-      } else {
-        this.textarea.selectionEnd = cursorPosition + text.length;
-      }
+      this.textarea.selectionEnd = cursorPosition + text.length;
     }
   }
 

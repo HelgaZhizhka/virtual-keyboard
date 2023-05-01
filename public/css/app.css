@@ -439,6 +439,9 @@ body {
   -webkit-transform: translateY(1px);
           transform: translateY(1px);
 }
+.key[data-key=ControlLeft], .key[data-key=AltLeft], .key[data-key=ControlRight], .key[data-key=AltRight] {
+  text-transform: lowercase !important;
+}
 .key[data-key=Space] {
   width: 220px;
   text-indent: -9999px;
@@ -483,4 +486,10 @@ body {
 .key[data-key=CapsLock].active::after {
   border-color: #39ff14;
   background-color: #39ff14;
+}
+
+.key-fade {
+  -webkit-transition: opacity 0.25s ease-in-out;
+  transition: opacity 0.25s ease-in-out;
+  opacity: 0;
 }/*# sourceMappingURL=app.css.map */
