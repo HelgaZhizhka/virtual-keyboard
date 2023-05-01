@@ -15,8 +15,24 @@ export class MagicKeyboard {
     this[_privateData] = [].concat(...data);
   }
 
-  getArrayKeys() {
-    return Object.keys(this.keys).map((key) => this.keys[key]);
+  updateLanguageLabels() {
+    this.languageManager.toggleLanguage();
+    const updateKey = (keyData) => {
+      const key = this.keys[keyData.key];
+      const keyValue = this.inputKeyboard.getKeyValue(keyData);
+      key.textContent = keyValue;
+    };
+    this[_privateData].forEach((keyData) => {
+      if (keyData.printable && keyData[this.languageManager.currentLanguage].match(/[a-zA-Zа-яА-ЯёЁ]/)) {
+        if (keyData.altEn || keyData.altRu) {
+          setTimeout(() => {
+            updateKey(keyData);
+          }, 50);
+        } else {
+          updateKey(keyData);
+        }
+      }
+    });
   }
 
   toggleButtonState(keyCode, active) {
@@ -25,7 +41,8 @@ export class MagicKeyboard {
   }
 
   updateCapsLockLabels() {
-    const buttons = this.getArrayKeys().filter((btn) => +btn.dataset.print && btn.textContent.match(/[a-zA-Zа-яА-ЯёЁ]/));
+    const getArrayKeys = () => Object.keys(this.keys).map((key) => this.keys[key]);
+    const buttons = getArrayKeys().filter((btn) => +btn.dataset.print && btn.textContent.match(/[a-zA-Zа-яА-ЯёЁ]/));
     buttons.forEach((btn) => {
       const button = btn;
       if (this.isCapsLocked) {
@@ -71,6 +88,10 @@ export class MagicKeyboard {
         }
       } else if (['ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight'].includes(keyCode)) {
         this.updateKeyLabels(event.shiftKey, event.altKey);
+      }
+
+      if (event.altKey && event.ctrlKey) {
+        this.updateLanguageLabels();
       }
 
       this.inputKeyboard.keyDetection(keyData, shiftKey, altKey, this.isCapsLocked);

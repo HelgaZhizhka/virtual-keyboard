@@ -14,7 +14,7 @@ const onLoadPage = () => {
   const languageManager = new LanguageManager();
   const inputKeyboard = new InputKeyboard(sectionInput, languageManager);
   const keyboard = new MagicKeyboard(sectionContainer, data, inputKeyboard, languageManager);
-
+  languageManager.loadLanguageFromLocalStorage();
   inputKeyboard.init();
   keyboard.init();
 };
