@@ -74,7 +74,7 @@ class MagicKeyboard {
   }
 
   handleKeyDown(event, isMouseEvent = false) {
-    event.preventDefault();
+    if (!isMouseEvent) event.preventDefault();
     this.inputKeyboard.focus();
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
@@ -111,7 +111,7 @@ class MagicKeyboard {
   }
 
   handleKeyUp(event, isMouseEvent = false) {
-    event.preventDefault();
+    if (!isMouseEvent) event.preventDefault();
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
       const keyCode = key.dataset.key;
