@@ -1,0 +1,11 @@
+@use "sass:math";
+
+@function strip-unit($value) {
+  @return $value / ($value * 0 + 1);
+}
+
+$html-font-size: 16px;
+// Function for converting a px based font-size to rem.
+@function toRem($size) {
+  @return math.div($size, $html-font-size) * 1rem;
+}

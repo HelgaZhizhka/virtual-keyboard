@@ -1,0 +1,17 @@
+.keyboard {
+  padding: 1rem;
+  background: linear-gradient(95.15deg, rgba(255, 255, 255, 0.3) 2.86%, rgba(255, 255, 255, 0) 30.59%, rgba(255, 255, 255, 0.3) 48.18%, rgba(255, 255, 255, 0.243) 64.3%, rgba(255, 255, 255, 0.3) 96.67%), #C4C4C4 url(../images/noise.png);
+  box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.25), 0px 10px 20px rgba(0, 0, 0, 0.25), 0px 2px 4px rgba(0, 0, 0, 0.35);
+  border-radius: 1rem;
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    &:not(:last-child) {
+      margin-bottom: 0.25rem;
+    }
+  }
+  &__key {
+    margin: 0.3rem;
+  }
+}

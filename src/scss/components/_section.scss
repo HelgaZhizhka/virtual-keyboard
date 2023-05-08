@@ -1,0 +1,55 @@
+.section {
+  padding: 50px 0;
+  &__heading {
+    font-size: 2rem;
+    margin: 0 0 1.25rem;
+  }
+  &__heading,
+  &__description {
+    text-shadow: 0 2px 4px rgba(136, 136, 136, 0.2);
+    text-align: center;
+  }
+  &__textarea {
+    .textarea {
+      width: 100%;
+      height: 150px;
+      font-size: 1.25rem;
+      resize: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+      transform: translateY(1px);
+    }
+  }
+  &__container {
+    margin-top: 1rem;
+    animation-delay: 0.15s;
+  }
+  &__description,
+  &__container {
+    transform: translateY(100%);
+    opacity: 0;
+    animation-name: slide-up;
+    animation-duration: 0.56s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+  &__description {
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    animation-delay: 0.65s;
+    p {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+@keyframes slide-up {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,87 @@
+.key {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 3rem;
+  height: 3rem;
+  padding: 0.5rem;
+  font-family: var(--system-ui);
+  font-size: 1rem;
+  font-weight: 500;
+  border: 0;
+  background-color: var(--light-gray);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 0px 3px rgba(0, 0, 0, 0.45),
+    inset 0px 3px 0px #ffffff;
+  border-radius: 8px;
+  color: var(--dark-gray);
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  &:disabled,
+  &.disabled {
+    box-shadow: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  &:hover {
+    background-color: var(--color-white);
+  }
+  &:active,
+  &.active {
+    background-color: var(--color-white);
+    transform: translateY(1px);
+  }
+  &[data-key="Space"] {
+    width: 220px;
+    text-indent: -9999px;
+  }
+  &[data-key="Enter"],
+  &[data-key="CapsLock"],
+  &[data-key="ShiftLeft"],
+  &[data-key="ShiftRight"] {
+    width: 105px;
+  }
+  &[data-key="Backspace"],
+  &[data-key="Tab"] {
+    width: 100px;
+  }
+  &[data-key="Tab"],
+  &[data-key="ShiftLeft"],
+  &[data-key="CapsLock"] {
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
+  &[data-key="Enter"],
+  &[data-key="ShiftRight"],
+  &[data-key="Backspace"] {
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+  &[data-key="CapsLock"] {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 8px;
+      width: 8px;
+      height: 8px;
+      z-index: 10;
+      background-color: inherit;
+      border: 1px solid var(--gray);
+      border-radius: 50%;
+    }
+    &.active {
+      &::after {
+        border-color: #39ff14;
+        background-color: #39ff14;
+      }
+    }
+  }
+}
+.key-fade {
+  transition: opacity 0.25s ease-in-out;
+  opacity: 0;
+}
