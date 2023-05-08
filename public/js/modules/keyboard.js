@@ -1,3 +1,5 @@
+import MagicKey from './MagicKey.js';
+
 const privateArr = Symbol('privateArr');
 const isWindows = /Win/.test(window.navigator.userAgent);
 
@@ -74,7 +76,7 @@ class MagicKeyboard {
   }
 
   handleKeyDown(event, isMouseEvent = false) {
-    event.preventDefault();
+    if (!isMouseEvent) event.preventDefault();
     this.inputKeyboard.focus();
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
@@ -111,7 +113,7 @@ class MagicKeyboard {
   }
 
   handleKeyUp(event, isMouseEvent = false) {
-    event.preventDefault();
+    if (!isMouseEvent) event.preventDefault();
     const key = isMouseEvent ? event.target.closest('.keyboard__key') : this.keys[event.code];
     if (key) {
       const keyCode = key.dataset.key;
@@ -151,18 +153,9 @@ class MagicKeyboard {
       this.container.appendChild(rowElement);
 
       row.forEach((keyData) => {
-        const key = document.createElement('button');
-        key.classList.add('keyboard__key', 'key');
-        key.dataset.key = keyData.key;
-        key.dataset.print = +keyData.printable;
-
-        const span = document.createElement('span');
-        span.classList.add('key__value');
-        span.textContent = keyData[this.languageManager.currentLanguage];
-        key.appendChild(span);
-
-        rowElement.appendChild(key);
-        this.keys[keyData.key] = key;
+        const key = new MagicKey(keyData, this.languageManager);
+        rowElement.appendChild(key.element);
+        this.keys[keyData.key] = key.element;
       });
     });
 
